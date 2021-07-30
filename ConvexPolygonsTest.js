@@ -62,10 +62,6 @@ $(function() {
 
             if (sat(polygonA, polygonB)) {
                 document.body.style.backgroundColor = "red";
-                // ady = -ady;
-                // adx = -adx;
-                // bdx = -bdx;
-                // bdy = -bdy;
             } else {
                 document.body.style.backgroundColor = "rgb(247, 231, 238)";
             }
