@@ -5,43 +5,47 @@ $(function() {
 
 
 
-        var a1 = new xy(123, 153);
-        var a2 = new xy(188, 164);
-        var a3 = new xy(203, 107);
-        var a4 = new xy(133, 84);
+        var a1 = new xy(74, 62);
+        var a2 = new xy(69, 184);
+        var a3 = new xy(196, 176);
+        var a4 = new xy(229, 75);
 
-        var b1 = new xy(400, 330);
-        var b2 = new xy(500, 320);
-        var b3 = new xy(390, 200);
-        var b4 = new xy(370, 230);
+        var b1 = new xy(641, 654);
+        var b2 = new xy(578, 632);
+        var b3 = new xy(659, 536);
+        var b4 = new xy(734, 639);
 
 
         var A = [a1, a2, a3, a4];
         var B = [b1, b2, b3, b4];
 
-        var speed = 3;
+        var speed = 0.5;
         var adx = speed;
         var ady = speed;
         var bdx = -speed;
         var bdy = -speed;
 
 
+        var lastFrameTimeMs = 0;
+        var maxFPS = 10;
+        var delta = 0;
 
-        function draw() {
+        function draw(timestamp) {
+
+            delta = timestamp - lastFrameTimeMs; // get the delta time since last frame
+            lastFrameTimeMs = timestamp;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height); // clear the before canvas
             for (let index = 0; index < A.length; index++) {
-                A[index].x += adx;
-                A[index].y += ady;
+                A[index].x += adx * delta;
+                A[index].y += ady * delta;
             }
             for (let index = 0; index < B.length; index++) {
-                B[index].x += bdx;
-                B[index].y += bdy;
+                B[index].x += 0.5 * bdx * delta;
+                B[index].y += bdy * delta;
             }
 
-            drawPoly1();
-            drawPoly2();
-            checkCol();
+
 
 
             var verticesA = [A[0], A[1], A[2], A[3]];
@@ -55,14 +59,21 @@ $(function() {
             var polygonB = new polygon(verticesB, edgesB);
 
 
+
             if (sat(polygonA, polygonB)) {
                 document.body.style.backgroundColor = "red";
+                ady = -ady;
+                adx = -adx;
+                bdx = -bdx;
+                bdy = -bdy;
             } else {
                 document.body.style.backgroundColor = "rgb(247, 231, 238)";
             }
             // sat(polygonA, polygonB);
 
-
+            drawPoly1();
+            drawPoly2();
+            checkCol();
 
             requestAnimationFrame(draw);
         }
@@ -129,14 +140,20 @@ $(function() {
         this.edge = edges;
     };
     //include appropriate test case code.
+    var amin = null;
+    var amax = null;
+    var bmin = null;
+    var bmax = null;
+    var invade = null;
+
     function sat(polygonA, polygonB) {
         var perpendicularLine = null;
         var dot = 0;
         var perpendicularStack = [];
-        var amin = null;
-        var amax = null;
-        var bmin = null;
-        var bmax = null;
+        amin = null;
+        amax = null;
+        bmin = null;
+        bmax = null;
         for (var i = 0; i < polygonA.edge.length; i++) {
             perpendicularLine = new xy(-polygonA.edge[i].y, polygonA.edge[i].x);
             perpendicularStack.push(perpendicularLine);
@@ -175,14 +192,20 @@ $(function() {
                 }
             }
 
+
             if ((amin < bmax && amin > bmin) ||
                 (bmin < amax && bmin > amin)) {
+                if (amax >= bmax) {
+                    invade = Math.abs(amax - bmin) - Math.abs(amax - bmax) - Math.abs(amin - bmin);
+                } else { invade = Math.abs(bmax - amin) - Math.abs(bmax - amax) - Math.abs(bmin - amin); }
                 continue;
             } else {
                 return false;
             }
 
         }
+
+
         return true;
     }
 });
