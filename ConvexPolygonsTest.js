@@ -19,7 +19,7 @@ $(function() {
         var A = [a1, a2, a3, a4];
         var B = [b1, b2, b3, b4];
 
-        var speed = 0.5;
+        var speed = 0.3;
         var adx = speed;
         var ady = speed;
         var bdx = -speed;
@@ -67,10 +67,6 @@ $(function() {
 
             if (sat(polygonA, polygonB)) {
                 document.body.style.backgroundColor = "red";
-                // ady = -ady;
-                // adx = -adx;
-                // bdx = -bdx;
-                // bdy = -bdy;
             } else {
                 document.body.style.backgroundColor = "rgb(247, 231, 238)";
             }
