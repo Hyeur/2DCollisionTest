@@ -1,11 +1,41 @@
 $(function() {
+    var velocity = 1;
+    var adx = velocity;
+    var ady = velocity;
+    var bdx = -velocity;
+    var bdy = -velocity;
+
+    $(document).ready(function() {
+        $("#minus").click(function() {
+            updateVelocity(2);
+        });
+        $("#plus").click(function() {
+            updateVelocity(1);
+        });
+    })
+
+    function updateVelocity(status) {
+        if (status === 1) {
+            velocity += 1;
+        }
+        if (status === 2) {
+            velocity -= 1;
+        }
+        adx = velocity;
+        ady = velocity;
+        bdx = -velocity;
+        bdy = -velocity;
+    }
+
+
+
     var canvas = document.getElementById('Canvas');
     if (canvas.getContext) {
+
         var ctx = canvas.getContext('2d');
 
 
-
-        var a1 = new xy(74, 62);
+        var a1 = new xy(100, 62);
         var a2 = new xy(69, 184);
         var a3 = new xy(196, 176);
         var a4 = new xy(229, 75);
@@ -19,38 +49,28 @@ $(function() {
         var A = [a1, a2, a3, a4];
         var B = [b1, b2, b3, b4];
 
-        var speed = 0.3;
-        var adx = speed;
-        var ady = speed;
-        var bdx = -speed;
-        var bdy = -speed;
+
+
 
 
         var lastFrameTimeMs = 0;
-        var maxFPS = 200;
+        var maxFPS = 9999;
         var delta = 0;
+        var timestep = 1000 / maxFPS;
 
         function draw(timestamp) {
-
             if (timestamp < lastFrameTimeMs + (1000 / maxFPS)) {
                 requestAnimationFrame(draw);
                 return;
             }
 
-            delta = timestamp - lastFrameTimeMs; // get the delta time since last frame
+            delta += timestamp - lastFrameTimeMs; // get the delta time since last frame
             lastFrameTimeMs = timestamp;
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // clear the before canvas
-            for (let index = 0; index < A.length; index++) {
-                A[index].x += adx * delta;
-                A[index].y += ady * delta;
+            while (delta >= timestep) {
+                update(timestep);
+                delta -= timestep;
             }
-            for (let index = 0; index < B.length; index++) {
-                B[index].x += 0.5 * bdx * delta;
-                B[index].y += bdy * delta;
-            }
-
-
 
 
             var verticesA = [A[0], A[1], A[2], A[3]];
@@ -71,10 +91,11 @@ $(function() {
                 document.body.style.backgroundColor = "rgb(247, 231, 238)";
             }
             // sat(polygonA, polygonB);
-
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // clear the before canvas
             drawPoly1();
             drawPoly2();
-            checkCol();
+            drawSpeed();
+
 
             requestAnimationFrame(draw);
         }
@@ -83,6 +104,23 @@ $(function() {
         requestAnimationFrame(draw);
     }
 
+    function drawSpeed() {
+        ctx.font = "16px Arial";
+        ctx.fillStyle = "green";
+        ctx.fillText("Speed: " + velocity, 8, 20);
+    }
+
+    function update(para) {
+        for (let index = 0; index < A.length; index++) {
+            A[index].x += adx * para;
+            A[index].y += ady * para;
+        }
+        for (let index = 0; index < B.length; index++) {
+            B[index].x += 0.5 * bdx * para;
+            B[index].y += bdy * para;
+        }
+        checkCol();
+    }
 
     function checkCol() {
         for (let i = 0; i < A.length; i++) {
@@ -103,7 +141,6 @@ $(function() {
         }
 
     }
-
 
     function drawPoly1() {
         ctx.fillStyle = '#f00';
