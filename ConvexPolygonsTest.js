@@ -27,10 +27,15 @@ $(function() {
 
 
         var lastFrameTimeMs = 0;
-        var maxFPS = 10;
+        var maxFPS = 200;
         var delta = 0;
 
         function draw(timestamp) {
+
+            if (timestamp < lastFrameTimeMs + (1000 / maxFPS)) {
+                requestAnimationFrame(draw);
+                return;
+            }
 
             delta = timestamp - lastFrameTimeMs; // get the delta time since last frame
             lastFrameTimeMs = timestamp;
@@ -79,9 +84,9 @@ $(function() {
         }
 
 
-
+        requestAnimationFrame(draw);
     }
-    requestAnimationFrame(draw);
+
 
     function checkCol() {
         for (let i = 0; i < A.length; i++) {
