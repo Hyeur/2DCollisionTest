@@ -16,10 +16,10 @@ $(function() {
 
     function updateVelocity(status) {
         if (status === 1) {
-            velocity += 1;
+            velocity += 0.1;
         }
         if (status === 2) {
-            velocity -= 1;
+            velocity -= 0.1;
         }
         adx = velocity;
         ady = velocity;
