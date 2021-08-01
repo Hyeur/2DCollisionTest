@@ -27,7 +27,9 @@ $(function() {
         bdy = -velocity;
     }
 
-
+    function panic() {
+        delta = 0;
+    }
 
     var canvas = document.getElementById('Canvas');
     if (canvas.getContext) {
@@ -57,6 +59,10 @@ $(function() {
         var maxFPS = 9999;
         var delta = 0;
         var timestep = 1000 / maxFPS;
+        var fps = 60;
+        var framesThisSecond = 0;
+        var lastFpsUpdate = 0;
+
 
         function draw(timestamp) {
             if (timestamp < lastFrameTimeMs + (1000 / maxFPS)) {
@@ -67,9 +73,22 @@ $(function() {
             delta += timestamp - lastFrameTimeMs; // get the delta time since last frame
             lastFrameTimeMs = timestamp;
 
+            if (timestamp > lastFpsUpdate + 1000) { //Fps counter
+                fps = 0.25 * framesThisSecond + 0.75 * fps;
+
+                lastFpsUpdate = timestamp;
+                framesThisSecond = 0;
+            }
+            framesThisSecond++;
+
+            var numUpdateSteps = 0;
             while (delta >= timestep) {
                 update(timestep);
                 delta -= timestep;
+                if (++numUpdateSteps >= 240) {
+                    panic();
+                    break;
+                }
             }
 
 
@@ -99,6 +118,7 @@ $(function() {
             drawPoly1();
             drawPoly2();
             drawSpeed();
+            drawFps();
 
 
             requestAnimationFrame(draw);
@@ -112,6 +132,12 @@ $(function() {
         ctx.font = "16px Arial";
         ctx.fillStyle = "green";
         ctx.fillText("Speed: " + Math.round((velocity + Number.EPSILON) * 100) / 100, 8, 20);
+    }
+
+    function drawFps() {
+        ctx.font = "16px Arial";
+        ctx.fillStyle = "green";
+        ctx.fillText(Math.round(fps) + " FPS", canvas.width - 70, 20);
     }
 
     function update(para) {
