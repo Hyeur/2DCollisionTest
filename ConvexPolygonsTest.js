@@ -111,7 +111,7 @@ $(function() {
     function drawSpeed() {
         ctx.font = "16px Arial";
         ctx.fillStyle = "green";
-        ctx.fillText("Speed: " + velocity, 8, 20);
+        ctx.fillText("Speed: " + Math.round((velocity + Number.EPSILON) * 100) / 100, 8, 20);
     }
 
     function update(para) {
