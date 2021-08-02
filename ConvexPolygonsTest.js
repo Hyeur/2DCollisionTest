@@ -4,6 +4,10 @@ $(function() {
     var ady = velocity;
     var bdx = -velocity;
     var bdy = -velocity;
+    var running = false,
+        started = false,
+        frameID = null;
+
 
     $(document).ready(function() {
         $("#minus").click(function() {
@@ -11,6 +15,12 @@ $(function() {
         });
         $("#plus").click(function() {
             updateVelocity(1);
+        });
+        $("#start").click(function() {
+            start();
+        });
+        $("#stop").click(function() {
+            stop();
         });
     })
 
@@ -31,20 +41,11 @@ $(function() {
         delta = 0;
     }
 
-    var running = false,
-        started = false;
-
-    function stop() {
-        running = false;
-        started = false;
-        cancelAnimationFrame(frameID);
-    }
-
     function start() {
         if (!started) {
             started = true;
             frameID = requestAnimationFrame(function(timestamp) {
-                draw(1);
+                draw(timestamp);
                 running = true;
                 lastFrameTimeMs = timestamp;
                 lastFpsUpdate = timestamp;
@@ -53,6 +54,7 @@ $(function() {
             });
         }
     }
+
 
     var canvas = document.getElementById('Canvas');
     if (canvas.getContext) {
@@ -70,13 +72,8 @@ $(function() {
         var b3 = new xy(659, 536);
         var b4 = new xy(734, 639);
 
-
         var A = [a1, a2, a3, a4];
         var B = [b1, b2, b3, b4];
-
-
-
-
 
         var lastFrameTimeMs = 0;
         var maxFPS = 999;
@@ -148,9 +145,14 @@ $(function() {
 
             frameID = requestAnimationFrame(draw);
         }
+    }
 
-
-        start();
+    function stop() {
+        if (frameID) {
+            running = false;
+            started = false;
+            cancelAnimationFrame(frameID);
+        }
     }
 
     function begin() {}
