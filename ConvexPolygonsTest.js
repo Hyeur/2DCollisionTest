@@ -31,6 +31,29 @@ $(function() {
         delta = 0;
     }
 
+    var running = false,
+        started = false;
+
+    function stop() {
+        running = false;
+        started = false;
+        cancelAnimationFrame(frameID);
+    }
+
+    function start() {
+        if (!started) {
+            started = true;
+            frameID = requestAnimationFrame(function(timestamp) {
+                draw(1);
+                running = true;
+                lastFrameTimeMs = timestamp;
+                lastFpsUpdate = timestamp;
+                framesThisSecond = 0;
+                frameID = requestAnimationFrame(draw);
+            });
+        }
+    }
+
     var canvas = document.getElementById('Canvas');
     if (canvas.getContext) {
 
@@ -56,7 +79,7 @@ $(function() {
 
 
         var lastFrameTimeMs = 0;
-        var maxFPS = 9999;
+        var maxFPS = 999;
         var delta = 0;
         var timestep = 1000 / maxFPS;
         var fps = 60;
@@ -65,8 +88,9 @@ $(function() {
 
 
         function draw(timestamp) {
+            begin();
             if (timestamp < lastFrameTimeMs + (1000 / maxFPS)) {
-                requestAnimationFrame(draw);
+                frameID = requestAnimationFrame(draw);
                 return;
             }
 
@@ -119,14 +143,26 @@ $(function() {
             drawPoly2();
             drawSpeed();
             drawFps();
+            end(fps);
 
 
-            requestAnimationFrame(draw);
+            frameID = requestAnimationFrame(draw);
         }
 
 
-        requestAnimationFrame(draw);
+        start();
     }
+
+    function begin() {}
+
+    function end(fps) {
+        if (fps < 144) {
+            document.body.style.backgroundColor = "rgb(247, 231, 238)";
+        } else if (fps > 144) {
+            document.body.style.backgroundColor = "#a6ffb3";
+        }
+    }
+
 
     function drawSpeed() {
         ctx.font = "16px Arial";
